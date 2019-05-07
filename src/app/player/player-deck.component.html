@@ -1,0 +1,5 @@
+<div class="flex player-deck">
+  <div class="w-1/{{ players.length }}" *ngFor="let player of players">
+    {{ player.name }} - <span class="money">${{ player.cash }} </span>
+  </div>
+</div>

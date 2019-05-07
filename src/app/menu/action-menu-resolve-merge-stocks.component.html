@@ -1,0 +1,112 @@
+<div>
+    <div *ngIf="!playerReadyToResolve">
+        <p>
+            <i>
+                {{ mergeResult.source.name }} is merging into {{ mergeResult.destination.name }}. 
+                {{ mergeResult.source.name }} stocks need to be resolved.
+            </i>
+        </p>
+        
+        <div style="margin-top: 10px;">
+            <div>Player 2</div>
+            <div>Kept 99, Traded 98, Sold 97</div>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <div>You</div>
+            <div>Have {{ stockShares }} shares</div>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <div>Player 3</div>
+            <div>Has 99 shares</div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button ion-button outline (click)="playerReadyToResolve = true" style="width:100%;">
+                <span class="icon icon-return-right"></span>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="playerReadyToResolve">
+
+        <p>Stocks: {{ stockShares }}</p>
+
+        <div class="grid__row">
+            <div class="grid__col">
+                <span>Keep</span>
+            </div>
+        </div>
+        <div class="grid__row">
+            <div class="grid__col grid__col_5">
+                <button ion-button outline style="width: 100%" (click)="removeHeld()" [disabled]="stockSharesToHold <= 0"> 
+                    <span class="icon icon-remove"></span>
+                </button>
+            </div>
+            <div class="grid__col grid__col_2" style="padding-top: 14px;">
+                <span style="font-size: 20px;">{{ stockSharesToHold }}</span>
+            </div>
+            <div class="grid__col grid__col_5">
+                <button ion-button outline style="width: 100%" (click)="hold()" [disabled]="stockShares <= 0">
+                    <span class="icon icon-add"></span>
+                </button>
+            </div>
+        </div>
+    
+        <div class="grid__row">
+            <div class="grid__col">
+                <span>Trade (2:1)</span>
+            </div>
+        </div>
+        <div class="grid__row">
+            <div class="grid__col grid__col_5">
+                <button ion-button outline style="width: 100%" (click)="removeTrade()" [disabled]="stockSharesToTrade <= 0">
+                    <span class="icon icon-remove"></span>
+                </button>
+            </div>
+            <div class="grid__col grid__col_2" style="padding-top: 14px;">
+                <span style="font-size: 20px;">{{ stockSharesToTrade }}</span>
+            </div>
+            <div class="grid__col grid__col_5">
+                <button ion-button outline style="width: 100%" (click)="trade()" [disabled]="!canTrade()">
+                    <span class="icon icon-add"></span>
+                </button>
+            </div>
+        </div>
+    
+        <div class="grid__row">
+            <div class="grid__col">
+                <span>Sell at ${{ mergeResult.source.getStockPrice() }}</span>
+            </div>
+        </div>
+        <div class="grid__row">
+            <div class="grid__col grid__col_5">
+                <button ion-button outline style="width: 100%" (click)="removeSold()" [disabled]="stockSharesToSell <= 0">
+                    <span class="icon icon-remove"></span>
+                </button>
+            </div>
+            <div class="grid__col grid__col_2" style="padding-top: 14px;">
+                <span style="font-size: 20px;">{{ stockSharesToSell }}</span>
+            </div>
+            <div class="grid__col grid__col_5">
+                <button ion-button outline style="width: 100%" (click)="sell()" [disabled]="stockShares <= 0">
+                    <span class="icon icon-add"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="grid__row">
+            <div class="grid__col grid__col_4">
+                <button ion-button outline (click)="playerReadyToResolve = false">
+                    <span class="icon icon-return-left"></span>
+                </button>
+            </div>
+            <div class="grid__col grid__col_8">
+                <button ion-button outline [disabled]="stockShares > 0 || isDone" style="width: 100%;" (click)="onOk()">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

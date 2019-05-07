@@ -1,0 +1,33 @@
+<div>
+  <div style="text-decoration: underline; margin-bottom: 10px;">
+    Recent Action:
+  </div>
+  <div style="text-align: left;">
+    <div *ngFor="let historyLog of historyLogs">
+      <div style="margin-left: 10px;">
+        {{ historyLog.player.name }}
+      </div>
+      <div style="margin-left: 20px">
+        Played tile {{ historyLog.tile.display }}
+      </div>
+
+      <div *ngIf="historyLog.stockShareOrder != null">
+        <div *ngFor="let stockShare of historyLog.stockShareOrder.stockShares">
+          <span *ngIf="stockShare.quantity > 0" style="margin-left: 20px">
+            Bought {{ stockShare.quantity }}
+            <span class="stock-color-{{ stockShare.hotelChain.type }}">{{
+              stockShare.hotelChain.abbreviation
+            }}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+  <button
+    (click)="ok()"
+    class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+  >
+    Ok
+  </button>
+</div>

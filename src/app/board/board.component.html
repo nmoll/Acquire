@@ -1,0 +1,13 @@
+<div class="board h-full">
+    <div *ngFor="let square of squares"
+        class="boardSquare {{getBoardSquareClass(square)}}"
+        (click)="onSquareSelected(square, $event)">
+        <span *ngFor="let shareholder of square.shareholders">
+            {{ shareholder.name }}
+        </span>
+        <span class="square-label">
+            <span *ngIf="!square.tile?.hotelChain">{{ square.getDisplay() }}</span>
+            <span *ngIf="square.tile?.hotelChain" class="hotel-id">{{ square.tile.hotelChain.abbreviation }}</span>
+        </span>
+    </div>
+</div>

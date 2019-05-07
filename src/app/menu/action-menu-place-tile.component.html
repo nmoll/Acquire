@@ -1,0 +1,6 @@
+<button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+    [disabled]="!canPlaceTile()" (click)="placeTile()">
+    Place Tile
+</button>
+
+<div *ngIf="isFirstRound()">Tip: Tap one of the highlighted tiles and then tap "Confirm"</div>

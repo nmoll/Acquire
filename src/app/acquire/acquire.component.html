@@ -1,0 +1,13 @@
+<div class="flex h-screen acquire-game">
+  <div class="flex flex-col w-3/4 acquire-game-col">
+    <player-deck [players]="playerService.getPlayers()"></player-deck>
+    <board
+      class="flex-grow"
+      [squares]="boardSquareService.boardSquares$ | async"
+      [currentPlayerAction]="currentPlayerAction"
+    ></board>
+  </div>
+  <div text-center class="w-1/4 acquire-game-col">
+    <action-menu (onMenuChange)="setCurrentPlayerAction($event)"></action-menu>
+  </div>
+</div>

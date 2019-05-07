@@ -1,0 +1,35 @@
+<div class="page-header">
+  <div class="navbar">
+    <div class="page-title">
+      {{ title }}
+    </div>
+    <div class="buttons" end>
+      <button ion-button [disabled]="!selectedHotelChain" (click)="onOk()" color="primary">
+        {{ confirmButtonText }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="card" *ngFor="let hotelChain of hotelChains"
+      class="stock-selection"
+      [class.selected]="selectedHotelChain === hotelChain"
+      (click)="selectHotelChain(hotelChain)">
+      <div class="card__header">
+        <div class="grid">
+          <div class="grid__row">
+            <div class="grid__col grid__col_4">
+              <span class="stock-color-{{hotelChain.type}}">
+                {{ hotelChain.name }}
+              </span>
+            </div>
+            <div class="grid__col grid__col_8" style="text-align:right;">
+              <span class="text-muted">Shares starting at -</span>
+              <span style="color: green;">${{ hotelChain.getStartingStockPrice() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>

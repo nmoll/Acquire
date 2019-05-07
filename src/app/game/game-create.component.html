@@ -1,0 +1,52 @@
+<div class="page-header">
+    <div class="navbar">
+        <div class="page-title">
+            New Game
+        </div>
+        <div class="buttons" end>
+            <button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+                (click)="startGame()" color="primary">
+                Start
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="page-content">
+    <div class="card" *ngFor="let player of players; let i = index">
+        <div class="card__header">
+            <div class="grid">
+                <div class="grid__row">
+                    <div class="grid__col grid__col_10">
+                        <span *ngIf="i > 0">Player {{ i + 1 }}</span>
+                        <span *ngIf="i == 0">You</span>
+                    </div>
+                    <div class="grid__col grid__col_2" text-right right>
+                        <button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+                             color="danger" (click)="removePlayer(player)" *ngIf="players.length > 2">
+                            <span class="icon icon-close"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card__content">
+            <div class="item">
+                <label color="primary">Player Name</label>
+                <input name="playerName" placeholder="Player Name" type="text" [(ngModel)]="player.name"/>
+            </div>
+            <div class="item" *ngIf="i > 0">
+                <label color="primary">Player Type</label>
+                <select [(ngModel)]="player.playerType">
+                    <option value="1">Person</option>
+                    <option value="2">Computer</option>
+                </select>
+            </div>
+        </div>
+  </div>
+  <button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+     (click)="addPlayer()" *ngIf="players.length < 4">
+      <span class="icon icon-add-circle"></span>
+      Add Player
+  </button>
+</div>

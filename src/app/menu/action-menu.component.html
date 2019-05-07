@@ -1,0 +1,50 @@
+<div *ngIf="!isCurrentPlayerComputer() || playerAction == PlayerActionType.RESOLVE_MERGE_STOCKS">
+    <!-- <button icon-left ion-button full outline large (click)="showScoreboard()">
+        <span class="icon icon-clipboard"></span> 
+        Scoreboard
+    </button> -->
+
+    <div [ngSwitch]="playerAction">
+        <div *ngSwitchCase="PlayerActionType.HISTORY_LOG">
+            <action-menu-history-log (onOk)="onHistoryLogOk()"></action-menu-history-log>
+        </div>
+        
+        <div *ngSwitchCase="PlayerActionType.PLACE_TILE" style="margin-top: 30px;">
+                <action-menu-place-tile></action-menu-place-tile>
+                <button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+                (click)="exitGame()" style="position: absolute; bottom: 0;">
+                <span class="icon icon-exit"></span> 
+                Exit Game
+            </button>
+        </div>
+        
+        <div *ngSwitchCase="PlayerActionType.BUY_STOCKS">
+            <action-menu-buy-stocks></action-menu-buy-stocks>
+        </div>
+
+        <div *ngSwitchCase="PlayerActionType.RESOLVE_MERGE_STOCKS">
+            <action-menu-resolve-merge-stocks 
+                *ngIf="resolveMergeStocksRequest"
+                (onDone)="onPlayerActionRequestDone()"
+                [playerActionRequest]="resolveMergeStocksRequest">
+            </action-menu-resolve-merge-stocks>
+        </div>
+    </div>
+
+
+    <button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded" 
+        (click)="endTurn()" *ngIf="playerAction == PlayerActionType.BUY_STOCKS">
+        End Turn
+    </button>
+    
+    <button class="bg-transparent hover:bg-blue text-blue-dark font-semibold hover:text-white py-2 px-4 border border-blue hover:border-transparent rounded"
+        *ngIf="canEndGame()" (click)="endGame()">
+        End Game
+    </button>
+    
+</div>
+
+<div *ngIf="isCurrentPlayerComputer() && playerAction != PlayerActionType.RESOLVE_MERGE_STOCKS" 
+    class="vertical-align-content" style="padding: 10px; padding-top: 50%; font-style: italic;">
+    <span>Waiting for {{  getCurrentPlayerName() }} to move..</span>
+</div>

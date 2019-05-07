@@ -1,0 +1,39 @@
+<div class="page-header">
+    <div class="navbar">
+        <div class="page-title">
+            Scoreboard
+        </div>
+
+        <div class="buttons" end>
+            <button ion-button (click)="close()" color="primary">
+                Done
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="page-content">
+  <table style="text-align: center;" class="table">
+      <thead>
+          <tr>
+              <th></th>
+              <th *ngFor="let hotelChain of hotelChains"
+                  class="hotel-chain-{{hotelChain.type}}"
+                  style="color: white;"
+                  [class.hidden]="collapsed">
+                  {{hotelChain.abbreviation}}
+              </th>
+              <th>$</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let player of players" [class.highlighted]="isCurrentPlayer(player)">
+              <td>{{player.name}}</td>
+              <td *ngFor="let hotelChain of hotelChains" [class.hidden]="collapsed">
+                  {{ player.getStockShareForHotelChain(hotelChain).quantity }}
+              </td>
+              <td>{{player.cash}}</td>
+          </tr>
+      </tbody>
+  </table>
+</div>
