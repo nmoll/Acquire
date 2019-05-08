@@ -1,4 +1,4 @@
 export class HotelChainServiceMock {
-    getMergeMajorityBonus () {}
-    getMergeMinorityBonus () {}
+  getMergeMajorityBonus() {}
+  getMergeMinorityBonus() {}
 }

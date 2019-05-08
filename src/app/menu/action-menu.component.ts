@@ -12,155 +12,164 @@ import { PlayerAction } from "../player-action/player-action.enum";
 import { PlayerActionRequestResolveMergeStocks } from "../player-action/player-action-request-resolve-merge-stocks";
 
 @Component({
-    selector: 'action-menu',
-    templateUrl: 'action-menu.component.html'
+  selector: "action-menu",
+  templateUrl: "action-menu.component.html"
 })
 export class PlayerActionComponent {
+  @Output() onMenuChange = new EventEmitter();
 
-    @Output() onMenuChange = new EventEmitter();
+  // For accessing in template
+  PlayerActionType = PlayerAction;
+  playerAction: PlayerAction;
 
-    // For accessing in template
-    PlayerActionType = PlayerAction;
-    playerAction: PlayerAction;
+  resolveMergeStocksRequest: PlayerActionRequestResolveMergeStocks;
 
-    resolveMergeStocksRequest: PlayerActionRequestResolveMergeStocks;
+  constructor(
+    // private modalCtrl: ModalController,
+    // private alertCtrl: AlertController,
+    // private navCtrl: NavController,
+    private playerService: PlayerService,
+    private hotelChainService: HotelChainService,
+    private acquireEventService: AcquireEventService,
+    private moveHandlerService: MoveHandlerService,
+    private stockShareService: StockShareService,
+    private gameService: GameService
+  ) {}
 
-    constructor(
-        // private modalCtrl: ModalController,
-        // private alertCtrl: AlertController,
-        // private navCtrl: NavController,
-        private playerService: PlayerService,
-        private hotelChainService: HotelChainService,
-        private acquireEventService: AcquireEventService,
-        private moveHandlerService: MoveHandlerService,
-        private stockShareService: StockShareService,
-        private gameService: GameService
-    ) {}
+  ngOnInit(): void {
+    this.acquireEventService.tilePlacedEvent.subscribe(tile => {
+      this.setPlayerAction(PlayerAction.BUY_STOCKS);
+    });
 
-    ngOnInit(): void {
+    this.acquireEventService.playerChangeEvent.subscribe(tile => {
+      this.setPlayerAction(PlayerAction.HISTORY_LOG);
+    });
 
-        this.acquireEventService.tilePlacedEvent.subscribe((tile) => {
-            this.setPlayerAction(PlayerAction.BUY_STOCKS);
-        });
+    this.acquireEventService.requestPlayerActionEvent.subscribe(
+      (playerActionRequest: PlayerActionRequestResolveMergeStocks) => {
+        console.log("requesting action", playerActionRequest);
+        this.resolveMergeStocksRequest = playerActionRequest;
+        this.setPlayerAction(playerActionRequest.getAction());
+      }
+    );
 
-        this.acquireEventService.playerChangeEvent.subscribe((tile) => {
-            this.setPlayerAction(PlayerAction.HISTORY_LOG);
-        });
+    this.setPlayerAction(PlayerAction.PLACE_TILE);
+  }
 
-        this.acquireEventService.requestPlayerActionEvent.subscribe((playerActionRequest: PlayerActionRequestResolveMergeStocks) => {
-            console.log('requesting action', playerActionRequest);
-            this.resolveMergeStocksRequest = playerActionRequest;
-            this.setPlayerAction(playerActionRequest.getAction());
-        });
+  onPlayerActionRequestDone(): void {
+    console.log("player action request done. setting action to BUY_STOCKS");
+    let callback = this.resolveMergeStocksRequest.getCallback();
+    callback();
+    this.setPlayerAction(PlayerAction.BUY_STOCKS);
+    this.resolveMergeStocksRequest = null;
+  }
 
-        this.setPlayerAction(PlayerAction.PLACE_TILE);
+  isCurrentPlayerComputer(): boolean {
+    return this.playerService.getCurrentPlayer().isComputer();
+  }
+
+  getCurrentPlayerName(): string {
+    return this.playerService.getCurrentPlayer().name;
+  }
+
+  showScoreboard(): void {
+    // TODO: fixme
+    // var modal = this.modalCtrl.create(ScoreboardComponent);
+    // modal.present();
+  }
+
+  getStockSharesForPurchase(): StockShare[] {
+    let stockShareOrder = this.playerService.getCurrentPlayer().stockShareOrder;
+    if (!stockShareOrder) {
+      return [];
     }
+    return stockShareOrder.stockShares;
+  }
 
-    onPlayerActionRequestDone(): void {
-        console.log('player action request done. setting action to BUY_STOCKS');
-        let callback = this.resolveMergeStocksRequest.getCallback();
-        callback();
-        this.setPlayerAction(PlayerAction.BUY_STOCKS);
-        this.resolveMergeStocksRequest = null;
+  endTurn(): void {
+    if (
+      !this.getStockSharesForPurchase().length &&
+      this.playerCanAffordAtleastOneStock()
+    ) {
+      // TODO: fixme
+      // let confirm = this.alertCtrl.create({
+      //     title: this.endTurnWithoutStocksTitle,
+      //     message: this.endTurnWithoutStocksMessage,
+      //     buttons: [
+      //         {
+      //             text: this.yesLabel,
+      //             handler: () => {
+      //                 this.acquireEventService.notifyEndTurn();
+      //             }
+      //         },
+      //         {
+      //             text: this.cancelLabel
+      //         }
+      //     ]
+      // });
+      // confirm.present();
+    } else {
+      this.acquireEventService.notifyEndTurn();
     }
+  }
 
-    isCurrentPlayerComputer(): boolean {
-        return this.playerService.getCurrentPlayer().isComputer();
-    }
-
-    getCurrentPlayerName(): string {
-        return this.playerService.getCurrentPlayer().name;
-    }
-
-    showScoreboard(): void {
-        // TODO: fixme
-        // var modal = this.modalCtrl.create(ScoreboardComponent);
-        // modal.present();
-    }
-
-    getStockSharesForPurchase(): StockShare[] {
-        let stockShareOrder = this.playerService.getCurrentPlayer().stockShareOrder;
-        if (!stockShareOrder) {
-            return [];
+  private playerCanAffordAtleastOneStock(): boolean {
+    let player = this.playerService.getCurrentPlayer();
+    let activeHotelChains = this.hotelChainService.getActiveHotelChains();
+    for (let hotelChain of activeHotelChains) {
+      if (this.stockShareService.hasAvailableStockShare(hotelChain)) {
+        if (player.cash > hotelChain.getStockPrice()) {
+          return true;
         }
-        return stockShareOrder.stockShares;
+      }
     }
+    return false;
+  }
 
-    endTurn(): void {
-        if (!this.getStockSharesForPurchase().length && this.playerCanAffordAtleastOneStock()) {
-            // TODO: fixme
-            // let confirm = this.alertCtrl.create({
-            //     title: this.endTurnWithoutStocksTitle,
-            //     message: this.endTurnWithoutStocksMessage,
-            //     buttons: [
-            //         {
-            //             text: this.yesLabel,
-            //             handler: () => {
-            //                 this.acquireEventService.notifyEndTurn();
-            //             }
-            //         },
-            //         {
-            //             text: this.cancelLabel
-            //         }
-            //     ]
-            // });
-            // confirm.present();
-        } else {
-            this.acquireEventService.notifyEndTurn();
-        }
+  onHistoryLogOk(): void {
+    this.setPlayerAction(PlayerAction.PLACE_TILE);
+  }
+
+  private setPlayerAction(playerAction: PlayerAction): void {
+    if (
+      this.playerService.getCurrentPlayer().playerType ==
+        PlayerType.FIRST_PERSON ||
+      playerAction == PlayerAction.RESOLVE_MERGE_STOCKS
+    ) {
+      this.playerAction = playerAction;
+      this.onMenuChange.emit(this.playerAction);
     }
+  }
 
-    private playerCanAffordAtleastOneStock(): boolean {
-        let player = this.playerService.getCurrentPlayer();
-        let activeHotelChains = this.hotelChainService.getActiveHotelChains();
-        for (let hotelChain of activeHotelChains) {
-            if (this.stockShareService.hasAvailableStockShare(hotelChain)) {
-                if (player.cash > hotelChain.getStockPrice()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+  canEndGame(): boolean {
+    return (
+      !this.gameService.isCurrentGameEnded() &&
+      this.moveHandlerService.canEndGame()
+    );
+  }
 
-    onHistoryLogOk(): void {
-        this.setPlayerAction(PlayerAction.PLACE_TILE);
-    }
+  endGame(): void {
+    // TODO: fixme
+    // let confirm = this.alertCtrl.create({
+    //     title: this.endGamePromptTitle,
+    //     message: this.endGamePromptMessage,
+    //     buttons: [
+    //         {
+    //             text: this.yesLabel,
+    //             handler: () => {
+    //                 this.moveHandlerService.endGame();
+    //             }
+    //         },
+    //         {
+    //             text: this.cancelLabel
+    //         }
+    //     ]
+    // });
+    // confirm.present();
+  }
 
-    private setPlayerAction(playerAction: PlayerAction): void {
-        if (this.playerService.getCurrentPlayer().playerType == PlayerType.FIRST_PERSON || playerAction == PlayerAction.RESOLVE_MERGE_STOCKS) {
-            this.playerAction = playerAction;
-            this.onMenuChange.emit(this.playerAction);
-        }
-    }
-
-    canEndGame(): boolean {
-        return !this.gameService.isCurrentGameEnded() && this.moveHandlerService.canEndGame();
-    }
-
-    endGame(): void {
-        // TODO: fixme
-        // let confirm = this.alertCtrl.create({
-        //     title: this.endGamePromptTitle,
-        //     message: this.endGamePromptMessage,
-        //     buttons: [
-        //         {
-        //             text: this.yesLabel,
-        //             handler: () => {
-        //                 this.moveHandlerService.endGame();
-        //             }
-        //         },
-        //         {
-        //             text: this.cancelLabel
-        //         }
-        //     ]
-        // });
-        // confirm.present();
-    }
-
-    exitGame(): void {
-        // TODO: Fixme
-        // this.navCtrl.popToRoot();
-    }
-
+  exitGame(): void {
+    // TODO: Fixme
+    // this.navCtrl.popToRoot();
+  }
 }

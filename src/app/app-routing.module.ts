@@ -1,21 +1,21 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { GameCreateComponent } from './game/game-create.component';
-import { AcquireComponent } from './acquire/acquire.component';
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { GameCreateComponent } from "./game/game-create.component";
+import { AcquireComponent } from "./acquire/acquire.component";
 
 const routes: Routes = [
   {
-    path: 'acquire',
+    path: "acquire",
     component: AcquireComponent
   },
   {
-    path: 'game/create',
+    path: "game/create",
     component: GameCreateComponent
   },
   {
-    path: '',
-    redirectTo: '/game/create',
-    pathMatch: 'full'
+    path: "",
+    redirectTo: "/game/create",
+    pathMatch: "full"
   }
 ];
 
@@ -23,4 +23,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -1,3 +1,1 @@
-export class FirstPersonMoveHandlerMock {
-    
-}
+export class FirstPersonMoveHandlerMock {}

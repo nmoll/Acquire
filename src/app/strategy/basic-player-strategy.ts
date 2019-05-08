@@ -19,77 +19,106 @@ import { PurchaseScenarioLockedInMinority } from "./scenario/purchase-stocks/pur
 
 @Injectable()
 export class BasicPlayerStrategy implements PlayerStrategy {
+  private purchaseStocksScenarios: PurchaseScenario[];
 
-    private purchaseStocksScenarios: PurchaseScenario[];
+  constructor(
+    private hotelChainService: HotelChainService,
+    private stockShareService: StockShareService,
+    private playerService: PlayerService
+  ) {
+    this.purchaseStocksScenarios = [
+      new PurchaseScenarioAreSharesAvailableForPurchase(stockShareService),
+      new PurchaseScenarioCanAffordStock(),
+      new PurchaseScenarioCanBeMajorityOwner(
+        this.playerService,
+        this.stockShareService
+      ),
+      new PurchaseScenarioCanBeMinorityOwner(
+        this.playerService,
+        this.stockShareService
+      ),
+      new PurchaseScenarioHaveFourStockMajorityLead(this.playerService),
+      new PurchaseScenarioHaveFourStockMinorityLead(this.playerService),
+      new PurchaseScenarioLockedInMajority(
+        this.playerService,
+        this.stockShareService
+      ),
+      new PurchaseScenarioLockedInMinority(
+        this.playerService,
+        this.stockShareService
+      ),
+      new PurchaseScenarioSoleMajorityMinorityExists(this.playerService)
+    ];
+  }
 
-    constructor(
-        private hotelChainService: HotelChainService,
-        private stockShareService: StockShareService,
-        private playerService: PlayerService
-    ) {
-        this.purchaseStocksScenarios = [
-            new PurchaseScenarioAreSharesAvailableForPurchase(stockShareService),
-            new PurchaseScenarioCanAffordStock(),
-            new PurchaseScenarioCanBeMajorityOwner(this.playerService, this.stockShareService),
-            new PurchaseScenarioCanBeMinorityOwner(this.playerService, this.stockShareService),
-            new PurchaseScenarioHaveFourStockMajorityLead(this.playerService),
-            new PurchaseScenarioHaveFourStockMinorityLead(this.playerService),
-            new PurchaseScenarioLockedInMajority(this.playerService, this.stockShareService),
-            new PurchaseScenarioLockedInMinority(this.playerService, this.stockShareService),
-            new PurchaseScenarioSoleMajorityMinorityExists(this.playerService)
-        ];
+  buyStocks(player: Player): StockShareOrder {
+    let activeHotelChains = this.hotelChainService.getActiveHotelChains();
+    let stockShareOrder = new StockShareOrder(activeHotelChains);
+
+    for (let i = 0; i < 3; i++) {
+      let valuesByHotelChain = this.calculateValuesByHotelChain(
+        activeHotelChains,
+        player,
+        stockShareOrder
+      );
+      let hotelPick = this.findHotelChainWithHighestValue(valuesByHotelChain);
+      if (hotelPick != null) {
+        for (let stockShare of stockShareOrder.stockShares) {
+          if (stockShare.hotelChain.type == hotelPick.type) {
+            stockShare.quantity++;
+          }
+        }
+      }
     }
 
-    buyStocks(player: Player): StockShareOrder {
-        let activeHotelChains = this.hotelChainService.getActiveHotelChains();
-        let stockShareOrder = new StockShareOrder(activeHotelChains);
+    return stockShareOrder;
+  }
 
-        for (let i = 0; i < 3; i++) {
-            let valuesByHotelChain = this.calculateValuesByHotelChain(activeHotelChains, player, stockShareOrder);
-            let hotelPick = this.findHotelChainWithHighestValue(valuesByHotelChain);
-            if (hotelPick != null) {
-                for (let stockShare of stockShareOrder.stockShares) {
-                    if (stockShare.hotelChain.type == hotelPick.type) {
-                        stockShare.quantity++;
-                    }
-                }
-            }
-        }
-        
-        return stockShareOrder;
+  private findHotelChainWithHighestValue(
+    valuesByHotelChain: Map<number, HotelChain>
+  ): HotelChain {
+    let highest = -1;
+    for (let value in valuesByHotelChain) {
+      highest = Math.max(highest, Number.parseInt(value));
     }
 
-    private findHotelChainWithHighestValue(valuesByHotelChain: Map<number, HotelChain>): HotelChain {
-        let highest = -1;
-        for (let value in valuesByHotelChain) {
-            highest = Math.max(highest, Number.parseInt(value));
-        }
-
-        if (highest >= 0) {
-            return valuesByHotelChain[highest];
-        } else {
-            return null;
-        }
+    if (highest >= 0) {
+      return valuesByHotelChain[highest];
+    } else {
+      return null;
     }
+  }
 
-    private calculateValuesByHotelChain(hotelChains: HotelChain[], player: Player, currentOrder: StockShareOrder): Map<number, HotelChain> {
-        let result = new Map<number, HotelChain>();
-        for (let hotelChain of hotelChains) {
-            let value = this.calculateValue(this.purchaseStocksScenarios, player, hotelChain, currentOrder);
-            if (!result[value]) {
-                result[value] = hotelChain; 
-            }
-        }
-        return result;
+  private calculateValuesByHotelChain(
+    hotelChains: HotelChain[],
+    player: Player,
+    currentOrder: StockShareOrder
+  ): Map<number, HotelChain> {
+    let result = new Map<number, HotelChain>();
+    for (let hotelChain of hotelChains) {
+      let value = this.calculateValue(
+        this.purchaseStocksScenarios,
+        player,
+        hotelChain,
+        currentOrder
+      );
+      if (!result[value]) {
+        result[value] = hotelChain;
+      }
     }
+    return result;
+  }
 
-    private calculateValue(scenarios, player: Player, hotelChain: HotelChain, currentOrder: StockShareOrder): number {
-        let value = 0;
-        for (let scenario of scenarios) {
-            value += scenario.calculateValue(player, hotelChain, currentOrder);
-        }
-        return value;
+  private calculateValue(
+    scenarios,
+    player: Player,
+    hotelChain: HotelChain,
+    currentOrder: StockShareOrder
+  ): number {
+    let value = 0;
+    for (let scenario of scenarios) {
+      value += scenario.calculateValue(player, hotelChain, currentOrder);
     }
-    
-
+    return value;
+  }
 }

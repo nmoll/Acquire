@@ -1,4 +1,4 @@
 export class GameMock {
-    getNextPlayerInList() {}
-    rotateCurrentPlayer() {}
+  getNextPlayerInList() {}
+  rotateCurrentPlayer() {}
 }

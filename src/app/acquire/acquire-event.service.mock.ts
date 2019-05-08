@@ -1,13 +1,13 @@
 export class AcquireEventServiceMock {
-    gameEnteredEvent = {
-        subscribe: function () {}
-    }
+  gameEnteredEvent = {
+    subscribe: function() {}
+  };
 
-    gameExitedEvent = {
-        subscribe: function () {}
-    }
+  gameExitedEvent = {
+    subscribe: function() {}
+  };
 
-    tileSelectedEvent = {
-        subscribe: function () {}
-    }
+  tileSelectedEvent = {
+    subscribe: function() {}
+  };
 }

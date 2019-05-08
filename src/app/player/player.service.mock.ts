@@ -1,6 +1,4 @@
 export class PlayerServiceMock {
-    
-    getMajorityStockholders() {}
-    getMinorityStockholders() {}
-
+  getMajorityStockholders() {}
+  getMinorityStockholders() {}
 }

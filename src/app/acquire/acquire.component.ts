@@ -32,14 +32,14 @@ export class AcquireComponent implements OnInit, OnDestroy {
   }
 
   startGame(): void {
-    let squares = this.boardSquareService.init();
-    let tiles = this.tileBagService.initTiles();
-    let hotelChains = this.hotelChainService.init();
-    let players = [
+    const squares = this.boardSquareService.init();
+    const tiles = this.tileBagService.initTiles();
+    const hotelChains = this.hotelChainService.init();
+    const players = [
       new Player("Nate", PlayerType.FIRST_PERSON),
       new Player("Kate", PlayerType.COMPUTER)
     ];
-    let game = new Game(players, players[0], squares, tiles, hotelChains);
+    const game = new Game(players, players[0], squares, tiles, hotelChains);
 
     this.gameService.addGame(game);
     // this.navCtrl.push(AcquireComponent);
